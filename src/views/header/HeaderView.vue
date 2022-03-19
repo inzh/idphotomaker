@@ -1,8 +1,8 @@
 <template>
   <Header class="header">
-    <Menu class="menu" mode="horizontal" theme="light" active-name="1">
+    <Menu class="menu" mode="horizontal" theme="light">
       <div class="layout-nav">
-        <MenuItem name="0" class="first">
+        <Dropdown class="upload-img">
           <Upload
             action="#"
             ref="upload"
@@ -13,26 +13,26 @@
             :accept="accept"
             :on-format-error="handleFormatError"
           >
-            <Icon type="ios-add-circle-outline" />
-            打开文件
+            <div class="upload">
+              <Icon type="ios-add-circle-outline" />
+              打开文件
+            </div>
           </Upload>
-        </MenuItem>
-        <MenuItem name="1">
-          <Icon type="ios-navigate"></Icon>
-          Item 1
-        </MenuItem>
-        <MenuItem name="2">
-          <Icon type="ios-keypad"></Icon>
-          Item 2
-        </MenuItem>
-        <MenuItem name="3">
-          <Icon type="ios-analytics"></Icon>
-          Item 3
-        </MenuItem>
-        <MenuItem name="4">
-          <Icon type="ios-paper"></Icon>
-          Item 4
-        </MenuItem>
+        </Dropdown>
+        <Dropdown class="crop-img">
+          <Button type="text">
+            <Icon type="ios-crop" />
+            裁剪图片
+          </Button>
+          <DropdownMenu slot="list">
+            <DropdownItem
+              ><Icon type="ios-ionitron-outline" /> 智能裁剪</DropdownItem
+            >
+            <DropdownItem
+              ><Icon type="ios-cut-outline" /> 手动裁剪</DropdownItem
+            >
+          </DropdownMenu>
+        </Dropdown>
       </div>
     </Menu>
   </Header>
@@ -47,9 +47,18 @@ export default {
   },
   methods: {
     loadImg(file) {
-      console.log(file);
-      this.$refs.upload.clearFiles();
-
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (img) => {
+        // 将上传的图片名字和base64Url分发
+        this.$store.dispatch("addImgData", {
+          imgName: file.name,
+          imgSrc: img.target.result,
+        });
+        this.$store.dispatch("changeCurrentImg", file.name);
+        // 清空上传列表
+        this.$refs.upload.clearFiles();
+      };
       // 禁止默认自动上传
       return false;
     },
@@ -66,10 +75,15 @@ export default {
   padding: 0 !important;
   .menu {
     width: 1024px;
-    .first {
-      padding: 0 76px !important;
+    .upload {
+      width: 225px;
+      text-align: center !important;
       background-color: #2e3033;
-      color: #fff;
+      color: #fff !important;
+    }
+    .upload:hover {
+      cursor: pointer;
+      color: #42b683 !important;
     }
   }
 }
