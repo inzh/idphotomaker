@@ -1,27 +1,16 @@
 <template>
   <div id="show-img">
-    <img :src="currentImgSrc" alt="" v-if="OriginImgData.length != 0" />
+    <img :src="getCurrentImgSrc" alt="" v-if="OriginImgData.length != 0" />
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 export default {
   name: "MainPreviewCard",
   computed: {
-    ...mapState([
-      "OriginImgData",
-      "ModifiedImgData",
-      "currentMainPreviewImgName",
-    ]),
-    currentImgSrc() {
-      if (this.OriginImgData) {
-        return this.OriginImgData.find(
-          (item) => item.imgName === this.currentMainPreviewImgName,
-        ).imgSrc;
-      }
-      return "";
-    },
+    ...mapState(["OriginImgData", "ModifiedImgData"]),
+    ...mapGetters(["getCurrentImgSrc"]),
   },
 };
 </script>

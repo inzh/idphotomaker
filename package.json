@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "face-api.js": "^0.22.2",
     "view-design": "^4.7.0",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",

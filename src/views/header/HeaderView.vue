@@ -1,50 +1,55 @@
 <template>
-  <Header class="header">
-    <Menu class="menu" mode="horizontal" theme="light">
-      <div class="layout-nav">
-        <Dropdown class="upload-img">
-          <Upload
-            action="#"
-            ref="upload"
-            :multiple="false"
-            :show-upload-list="false"
-            :before-upload="loadImg"
-            :format="['jpg', 'jpeg', 'png']"
-            :accept="accept"
-            :on-format-error="handleFormatError"
-          >
-            <div class="upload">
-              <Icon type="ios-add-circle-outline" />
-              打开文件
-            </div>
-          </Upload>
-        </Dropdown>
-        <Dropdown class="crop-img">
-          <Button type="text">
-            <Icon type="ios-crop" />
-            裁剪图片
-          </Button>
-          <DropdownMenu slot="list">
-            <DropdownItem
-              ><Icon type="ios-ionitron-outline" /> 智能裁剪</DropdownItem
+  <div class="header-view">
+    <Header class="header">
+      <Menu class="menu" mode="horizontal" theme="light">
+        <div class="layout-nav">
+          <Dropdown class="upload-img">
+            <Upload
+              action="#"
+              ref="upload"
+              :multiple="false"
+              :show-upload-list="false"
+              :before-upload="loadImg"
+              :format="['jpg', 'jpeg', 'png']"
+              :accept="accept"
+              :on-format-error="handleFormatError"
             >
-            <DropdownItem
-              ><Icon type="ios-cut-outline" /> 手动裁剪</DropdownItem
-            >
-          </DropdownMenu>
-        </Dropdown>
-      </div>
-    </Menu>
-  </Header>
+              <div class="upload">
+                <Icon type="ios-add-circle-outline" />
+                打开文件
+              </div>
+            </Upload>
+          </Dropdown>
+          <Dropdown class="crop-img">
+            <Button type="text">
+              <Icon type="ios-crop" />
+              裁剪图片
+            </Button>
+            <DropdownMenu slot="list">
+              <DropdownItem
+                ><div @click="smartCropModalVal = true">
+                  <Icon type="ios-ionitron-outline" /> 智能裁剪
+                </div></DropdownItem
+              >
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+      </Menu>
+    </Header>
+    <SmartCrop v-model="smartCropModalVal"></SmartCrop>
+  </div>
 </template>
 
 <script>
+import SmartCrop from "@/components/header/SmartCrop.vue";
 export default {
   data() {
     return {
       accept: "image/jpeg,image/jpg,image/png",
+      smartCropModalVal: false,
     };
   },
+  components: { SmartCrop },
   methods: {
     loadImg(file) {
       let reader = new FileReader();

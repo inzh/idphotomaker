@@ -9,7 +9,24 @@ export default new Vuex.Store({
     ModifiedImgData: [],
     currentMainPreviewImgName: "",
   },
-  getters: {},
+  getters: {
+    getCurrentImgSrc(state) {
+      if (state.OriginImgData) {
+        return state.OriginImgData.find(
+          (item) => item.imgName === state.currentMainPreviewImgName,
+        ).imgSrc;
+      }
+      return "";
+    },
+    getCurrentImgName(state) {
+      if (state.currentMainPreviewImgName) {
+        return state.OriginImgData.find(
+          (item) => item.imgSrc === state.currentMainPreviewImgName,
+        ).imgName;
+      }
+      return "";
+    },
+  },
   mutations: {
     ADD_IMG_DATA(state, img) {
       state.OriginImgData.push(img);
