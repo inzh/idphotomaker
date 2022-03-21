@@ -33,10 +33,10 @@
         >
           <!-- <template #choose> </template> -->
           <template #cancel>
-            <Button ref="cancelButton" type="text">取消</Button>
+            <Button ref="cancelButton" type="text" disabled>取消</Button>
           </template>
           <template #confirm>
-            <Button type="primary">裁剪</Button>
+            <Button ref="cropButton" type="primary" disabled>裁剪</Button>
           </template>
         </ImgCutter>
       </div>
@@ -45,7 +45,13 @@
           <!-- <img ref="previewimg" src="" alt="" /> -->
         </div>
         <div class="right-button">
-          <Button class="right-button" type="primary" @click="smartRotate">
+          <Button
+            ref="autoRotateButton"
+            class="right-button"
+            type="primary"
+            @click="smartRotate"
+            disabled
+          >
             自动矫正
           </Button>
         </div>
@@ -78,6 +84,9 @@ export default {
           name: this.$store.state.currentMainPreviewImgName,
           src: this.getCurrentImgSrc,
         });
+        this.$refs.cancelButton.$el.removeAttribute("disabled");
+        this.$refs.cropButton.$el.removeAttribute("disabled");
+        this.$refs.autoRotateButton.$el.removeAttribute("disabled");
       }
     },
   },
@@ -150,8 +159,8 @@ export default {
         const leftEye = landmarks.positions[36];
         const rightEye = landmarks.positions[45];
         this.autoRotate = this.calcAng(leftEye, rightEye);
-
-        this.$Message.success("自动旋转处理成功");
+        this.$Message.success("自动矫正处理成功");
+        this.$refs.autoRotateButton.$el.setAttribute("disabled", "false");
       } catch (error) {
         this.$Message.error("处理失败");
       }
@@ -162,6 +171,9 @@ export default {
       img.setAttribute("height", "225px");
       img.src = file.dataURL;
       this.$refs.previewimg.appendChild(img);
+      this.$refs.cancelButton.$el.setAttribute("disabled", "true");
+      this.$refs.cropButton.$el.setAttribute("disabled", "true");
+      this.$refs.autoRotateButton.$el.setAttribute("disabled", "true");
     },
     printImg(file) {
       let img = this.$refs.previewimg.firstChild;
@@ -180,6 +192,9 @@ export default {
         img.remove();
       }
       this.cutdownImgPreviewSrc = "";
+      this.$refs.cancelButton.$el.setAttribute("disabled", "true");
+      this.$refs.cropButton.$el.setAttribute("disabled", "true");
+      this.$refs.autoRotateButton.$el.setAttribute("disabled", "true");
     },
     error(err) {
       if (err.msg == "No picture selected") {
@@ -188,10 +203,15 @@ export default {
     },
     saveCropedImg() {
       const img = this.$refs.previewimg.firstChild;
-      this.$store.dispatch("updateImgData", {
-        imgName: this.currentMainPreviewImgName,
-        imgSrc: img.src,
-      });
+      if (img) {
+        this.$store.dispatch("updateImgData", {
+          imgName: this.currentMainPreviewImgName,
+          imgSrc: img.src,
+        });
+        this.$Message.success("保存修改成功");
+      } else {
+        this.$Message.error("未进行任何修改");
+      }
     },
   },
   mounted() {

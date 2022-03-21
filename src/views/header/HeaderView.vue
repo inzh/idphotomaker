@@ -77,7 +77,12 @@ export default {
       console.log("文件不是图片");
     },
     resetCurrentImg() {
-      this.$store.dispatch("resetCurrentImg");
+      if (this.$store.state.currentMainPreviewImgName == "") {
+        this.$Message.error("没有要重置的图片");
+      } else {
+        this.$store.dispatch("resetCurrentImg");
+        this.$Message.success("重置成功！");
+      }
     },
   },
 };
