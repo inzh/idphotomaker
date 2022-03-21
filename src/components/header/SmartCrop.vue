@@ -20,7 +20,7 @@
           :boxHeight="400"
           :showChooseBtn="false"
           :previewMode="true"
-          :sizeChange="false"
+          :sizeChange="true"
           :cutWidth="200"
           :cutHeight="280"
           rate="10:14"
@@ -29,10 +29,10 @@
         >
           <!-- <template #choose> </template> -->
           <template #cancel>
-            <Button type="text">取消</Button>
+            <Button ref="cancelButton" type="text">取消</Button>
           </template>
           <template #confirm>
-            <Button type="primary">取消</Button>
+            <Button type="primary">裁剪</Button>
           </template>
         </ImgCutter>
       </div>
@@ -41,8 +41,8 @@
           <img src="" alt="" />
         </div>
         <div class="right-button">
-          <Button class="right-button" type="primary" @click="rotate">
-            旋转
+          <Button class="right-button" type="primary" @click="smartRotate">
+            自动矫正
           </Button>
         </div>
       </div>
@@ -68,7 +68,14 @@ export default {
     smartCropModalVal(nv) {
       this.showModal = nv;
     },
-    getCurrentImgSrc() {},
+    showModal(nv) {
+      if (nv && this.$store.state.currentMainPreviewImgName) {
+        this.$refs.imgCutterModal.handleOpen({
+          name: this.$store.state.currentMainPreviewImgName,
+          src: this.getCurrentImgSrc,
+        });
+      }
+    },
   },
   data() {
     return {
@@ -77,51 +84,38 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getCurrentImgSrc", "getCurrentImgName"]),
+    ...mapGetters(["getCurrentImgSrc"]),
   },
   methods: {
     handleVisibleChange(val) {
       val || this.$emit("input", val);
+      this.$refs.cancelButton.$el.click();
     },
     async loadModel() {
       await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
       await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
     },
-    async smartCrop() {
+    async smartRotate() {
       try {
         await this.loadModel();
         let input = new Image();
         input.src = this.getCurrentImgSrc;
-        const canvas = this.$refs.canvas;
         const detectionWithLandmarks = await faceapi
           .detectSingleFace(input)
           .withFaceLandmarks();
         const landmarks = detectionWithLandmarks.landmarks;
         const leftEye = landmarks.positions[36];
         const rightEye = landmarks.positions[45];
-        const radian = Math.atan2(
-          leftEye.y - rightEye.y,
-          leftEye.x - rightEye.x,
+        const radian = Math.atan(
+          (leftEye.y - rightEye.y) / (leftEye.x - rightEye.x),
         );
-        const angle = 180 / (Math.PI * radian);
-        console.log(angle);
-        const displaySize = { width: input.width, height: input.height };
-        faceapi.matchDimensions(canvas, displaySize);
-        const resizedResults = faceapi.resizeResults(
-          detectionWithLandmarks,
-          displaySize,
-        );
-        faceapi.draw.drawDetections(canvas, resizedResults);
-        // draw the landmarks into the canvas
-        faceapi.draw.drawFaceLandmarks(canvas, resizedResults);
+        const angle = (radian * 180) / Math.PI;
+        this.autoRotate = angle;
       } catch (error) {
         console.log("模型加载失败");
       }
     },
     cutDown() {},
-    rotate() {
-      this.autoRotate = 20;
-    },
     // async smartCrop() {
     //   await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
     //   await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
