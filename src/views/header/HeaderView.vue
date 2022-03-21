@@ -16,7 +16,7 @@
             >
               <div class="upload">
                 <Icon type="ios-add-circle-outline" />
-                打开文件
+                打开图片
               </div>
             </Upload>
           </Dropdown>
@@ -27,17 +27,16 @@
             </Button>
           </Dropdown>
           <Dropdown class="crop-img">
-            <Button type="text">
+            <Button type="text" @click="smartCropModalVal = true">
               <Icon type="ios-crop" />
               裁剪图片
             </Button>
-            <DropdownMenu slot="list">
-              <DropdownItem
-                ><div @click="smartCropModalVal = true">
-                  <Icon type="ios-ionitron-outline" /> 智能裁剪
-                </div></DropdownItem
-              >
-            </DropdownMenu>
+          </Dropdown>
+          <Dropdown class="replace-bg">
+            <Button type="text">
+              <Icon type="ios-aperture-outline" />
+              背景替换
+            </Button>
           </Dropdown>
         </div>
       </Menu>

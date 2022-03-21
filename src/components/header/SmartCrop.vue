@@ -11,6 +11,7 @@
     cancel-text="取消修改"
     @on-visible-change="handleVisibleChange"
     @on-ok="saveCropedImg"
+    @on-cancel="closeModal"
   >
     <div class="img-cutter">
       <div class="modal-left">
@@ -211,6 +212,11 @@ export default {
         this.$Message.success("保存修改成功");
       } else {
         this.$Message.error("未进行任何修改");
+      }
+    },
+    closeModal() {
+      if (this.currentMainPreviewImgName != "") {
+        this.$Message.warning("未进行任何修改！");
       }
     },
   },
