@@ -26,6 +26,8 @@
           rate="10:14"
           :autoRotate="autoRotate"
           @cutDown="cutDown"
+          @onPrintImg="printImg"
+          @onClearAll="clearImg"
         >
           <!-- <template #choose> </template> -->
           <template #cancel>
@@ -37,8 +39,8 @@
         </ImgCutter>
       </div>
       <div class="modal-right">
-        <div class="preview-img">
-          <img src="" alt="" />
+        <div class="preview-img" ref="previewimg">
+          <!-- <img ref="previewimg" src="" alt="" /> -->
         </div>
         <div class="right-button">
           <Button class="right-button" type="primary" @click="smartRotate">
@@ -81,6 +83,7 @@ export default {
     return {
       showModal: false,
       autoRotate: 0,
+      cutdownImgPreview: "",
     };
   },
   computed: {
@@ -90,6 +93,25 @@ export default {
     handleVisibleChange(val) {
       val || this.$emit("input", val);
       this.$refs.cancelButton.$el.click();
+    },
+    calcAng(leftEye, rightEye) {
+      // 右眼在左眼上右上方
+      if (rightEye.y <= leftEye.y && rightEye.x >= leftEye.x) {
+        const radian = Math.atan(
+          (leftEye.y - rightEye.y) / (rightEye.x - leftEye.x),
+        );
+        const angle = (radian * 180) / Math.PI;
+        return angle;
+      }
+      // 右眼在左眼右下方
+      if (rightEye.y >= leftEye.y && leftEye.x < rightEye.x) {
+        const radian = Math.atan(
+          (rightEye.y - leftEye.y) / (rightEye.x - leftEye.x),
+        );
+        const angle = (radian * 180) / Math.PI;
+        return angle - 90;
+      }
+      // 第四象限
     },
     async loadModel() {
       await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
@@ -104,18 +126,37 @@ export default {
           .detectSingleFace(input)
           .withFaceLandmarks();
         const landmarks = detectionWithLandmarks.landmarks;
+
         const leftEye = landmarks.positions[36];
         const rightEye = landmarks.positions[45];
-        const radian = Math.atan(
-          (leftEye.y - rightEye.y) / (leftEye.x - rightEye.x),
-        );
-        const angle = (radian * 180) / Math.PI;
+        console.log(leftEye);
+        console.log(rightEye);
+        const angle = this.calcAng(leftEye, rightEye);
+        console.log(angle);
         this.autoRotate = angle;
       } catch (error) {
         console.log("模型加载失败");
       }
     },
-    cutDown() {},
+    cutDown(file) {
+      console.log(file.fileName);
+    },
+    printImg(file) {
+      let img = this.$refs.previewimg.firstChild;
+      if (!img) {
+        img = document.createElement("img");
+        img.src = file.dataURL;
+        this.$refs.previewimg.appendChild(img);
+      }
+      img.src = file.dataURL;
+      // this.$refs.previewimg.appendChild(img);
+    },
+    clearImg() {
+      const img = this.$refs.previewimg.firstChild;
+      if (img) {
+        img.remove();
+      }
+    },
     // async smartCrop() {
     //   await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
     //   await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
@@ -153,13 +194,15 @@ export default {
   display: flex;
   .modal-right {
     width: 198px;
-    background-color: aquamarine;
     text-align: center;
     .preview-img {
       margin: auto;
       width: 175px;
       height: 245px;
-      border: 1px solid #eee;
+      img {
+        width: 160px;
+        height: 225px;
+      }
     }
     .right-button {
       margin-top: 10px;
