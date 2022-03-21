@@ -10,6 +10,7 @@
     ok-text="保存修改"
     cancel-text="取消修改"
     @on-visible-change="handleVisibleChange"
+    @on-ok="saveCropedImg"
   >
     <div class="img-cutter">
       <div class="modal-left">
@@ -28,6 +29,7 @@
           @cutDown="cutDown"
           @onPrintImg="printImg"
           @onClearAll="clearImg"
+          @error="error"
         >
           <!-- <template #choose> </template> -->
           <template #cancel>
@@ -55,7 +57,7 @@
 <script>
 import * as faceapi from "face-api.js";
 import ImgCutter from "../vue-img-cutter@2.2.5/node_modules/vue-img-cutter/src/";
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 export default {
   name: "SmartCrop",
   components: {
@@ -83,16 +85,32 @@ export default {
     return {
       showModal: false,
       autoRotate: 0,
-      cutdownImgPreview: "",
+      cutdownImgPreviewSrc: "",
     };
   },
   computed: {
+    ...mapState(["currentMainPreviewImgName"]),
     ...mapGetters(["getCurrentImgSrc"]),
   },
   methods: {
     handleVisibleChange(val) {
-      val || this.$emit("input", val);
-      this.$refs.cancelButton.$el.click();
+      // val || this.$emit("input", val);
+      if (val == false) {
+        this.$emit("input", val);
+        this.autoRotate = 0;
+        this.$refs.cancelButton.$el.click();
+        this.cutdownImgPreviewSrc = "";
+      }
+      if (val == true) {
+        try {
+          this.cutdownImgPreviewSrc = this.getCurrentImgSrc;
+        } catch (err) {
+          console.log();
+        }
+      }
+      // this.autoRotate = -this.autoRotate;
+      // this.$refs.cancelButton.$el.click();
+      // this.autoRotate = -this.autoRotate;
     },
     calcAng(leftEye, rightEye) {
       // 右眼在左眼上右上方
@@ -109,7 +127,7 @@ export default {
           (rightEye.y - leftEye.y) / (rightEye.x - leftEye.x),
         );
         const angle = (radian * 180) / Math.PI;
-        return angle - 90;
+        return -angle;
       }
       // 第四象限
     },
@@ -119,69 +137,62 @@ export default {
     },
     async smartRotate() {
       try {
-        await this.loadModel();
+        if (this.cutdownImgPreviewSrc == "") {
+          throw "没有选择图片";
+        }
         let input = new Image();
-        input.src = this.getCurrentImgSrc;
+        input.src = this.cutdownImgPreviewSrc;
+        await this.loadModel();
         const detectionWithLandmarks = await faceapi
           .detectSingleFace(input)
           .withFaceLandmarks();
         const landmarks = detectionWithLandmarks.landmarks;
-
         const leftEye = landmarks.positions[36];
         const rightEye = landmarks.positions[45];
-        console.log(leftEye);
-        console.log(rightEye);
-        const angle = this.calcAng(leftEye, rightEye);
-        console.log(angle);
-        this.autoRotate = angle;
+        this.autoRotate = this.calcAng(leftEye, rightEye);
+
+        this.$Message.success("自动旋转处理成功");
       } catch (error) {
-        console.log("模型加载失败");
+        this.$Message.error("处理失败");
       }
     },
     cutDown(file) {
-      console.log(file.fileName);
+      const img = document.createElement("img");
+      img.setAttribute("width", "160px");
+      img.setAttribute("height", "225px");
+      img.src = file.dataURL;
+      this.$refs.previewimg.appendChild(img);
     },
     printImg(file) {
       let img = this.$refs.previewimg.firstChild;
       if (!img) {
         img = document.createElement("img");
+        img.setAttribute("width", "160px");
+        img.setAttribute("height", "225px");
         img.src = file.dataURL;
         this.$refs.previewimg.appendChild(img);
       }
       img.src = file.dataURL;
-      // this.$refs.previewimg.appendChild(img);
     },
     clearImg() {
       const img = this.$refs.previewimg.firstChild;
       if (img) {
         img.remove();
       }
+      this.cutdownImgPreviewSrc = "";
     },
-    // async smartCrop() {
-    //   await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
-    //   await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-    //   // const input = this.$refs.input;
-    //   let image = new Image()
-    //   image.src =
-    //   const canvas = this.$refs.canvas;
-    //   const detectionWithLandmarks = await faceapi
-    //     .detectSingleFace(input)
-    //     .withFaceLandmarks();
-    //   console.log(detectionWithLandmarks);
-    //   const landmarks = detectionWithLandmarks.landmarks;
-    //   // const landmarkPositions = landmarks.positions;
-
-    //   console.log(landmarks.getLeftEye());
-    //   const displaySize = { width: input.width, height: input.height };
-    //   faceapi.matchDimensions(canvas, displaySize);
-    //   const resizedResults = faceapi.resizeResults(
-    //     detectionWithLandmarks,
-    //     displaySize,
-    //   );
-    //   faceapi.draw.drawDetections(canvas, resizedResults);
-    //   // draw the landmarks into the canvas
-    //   faceapi.draw.drawFaceLandmarks(canvas, resizedResults);
-    // },
+    error(err) {
+      if (err.msg == "No picture selected") {
+        this.$Message.error("未选择图片");
+      }
+    },
+    saveCropedImg() {
+      const img = this.$refs.previewimg.firstChild;
+      this.$store.dispatch("updateImgData", {
+        imgName: this.currentMainPreviewImgName,
+        imgSrc: img.src,
+      });
+    },
   },
   mounted() {
     this.showModal = this.smartCropModalVal;
@@ -199,10 +210,6 @@ export default {
       margin: auto;
       width: 175px;
       height: 245px;
-      img {
-        width: 160px;
-        height: 225px;
-      }
     }
     .right-button {
       margin-top: 10px;

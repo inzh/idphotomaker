@@ -1,6 +1,6 @@
 <template>
   <div id="show-img">
-    <img :src="getCurrentImgSrc" alt="" v-if="OriginImgData.length != 0" />
+    <img :src="getCurrentImgSrc" alt="" v-if="ModifiedImgData.length != 0" />
   </div>
 </template>
 
@@ -9,7 +9,7 @@ import { mapState, mapGetters } from "vuex";
 export default {
   name: "MainPreviewCard",
   computed: {
-    ...mapState(["OriginImgData", "ModifiedImgData"]),
+    ...mapState(["ModifiedImgData"]),
     ...mapGetters(["getCurrentImgSrc"]),
   },
 };
