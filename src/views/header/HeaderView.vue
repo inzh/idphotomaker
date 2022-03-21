@@ -20,6 +20,12 @@
               </div>
             </Upload>
           </Dropdown>
+          <Dropdown class="reset-img">
+            <Button type="text" @click="resetCurrentImg">
+              <Icon type="ios-crop" />
+              重置修改
+            </Button>
+          </Dropdown>
           <Dropdown class="crop-img">
             <Button type="text">
               <Icon type="ios-crop" />
@@ -69,6 +75,9 @@ export default {
     },
     handleFormatError() {
       console.log("文件不是图片");
+    },
+    resetCurrentImg() {
+      this.$store.dispatch("resetCurrentImg");
     },
   },
 };

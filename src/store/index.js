@@ -63,6 +63,17 @@ export default new Vuex.Store({
     CHANGE_CURRENT_IMG(state, imgName) {
       state.currentMainPreviewImgName = imgName;
     },
+    RESET_CURRENT_IMG(state) {
+      if (state.ModifiedImgData.length > 0) {
+        const currentOriginImgData = state.OriginImgData.find(
+          (item) => item.imgName === state.currentMainPreviewImgName,
+        );
+        const ModifiedImgIndex = state.ModifiedImgData.findIndex(
+          (item) => item.imgName === state.currentMainPreviewImgName,
+        );
+        state.ModifiedImgData.splice(ModifiedImgIndex, 1, currentOriginImgData);
+      }
+    },
   },
   actions: {
     addImgData({ commit }, img) {
@@ -76,6 +87,9 @@ export default new Vuex.Store({
     },
     removeImg({ commit }, imgName) {
       commit("RM_IMG_DATA", imgName);
+    },
+    resetCurrentImg({ commit }) {
+      commit("RESET_CURRENT_IMG");
     },
   },
   modules: {},
