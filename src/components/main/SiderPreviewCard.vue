@@ -1,17 +1,17 @@
 <template>
   <div>
     <Card
-      class="card"
-      :padding="5"
       v-for="img in OriginImgData"
       :key="img.imgName"
+      class="card"
+      :padding="5"
     >
       <div
         class="preview-img"
         style="text-align: center"
         @click="changeMainPreview(img.imgName)"
       >
-        <img :src="img.imgSrc" />
+        <img :src="img.imgSrc">
       </div>
       <Tooltip
         class="remove-img"
@@ -22,10 +22,9 @@
         <Button
           type="text"
           size="large"
-          @click="removeImg(img.imgName)"
           icon="ios-trash"
-        >
-        </Button>
+          @click="removeImg(img.imgName)"
+        />
       </Tooltip>
       <!-- <div class="remove-img">
         <Button type="dashed" size="small"><Icon type="ios-trash" /></Button>
@@ -35,27 +34,27 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 export default {
-  name: "PreviewCard",
+  name: 'PreviewCard',
   computed: {
-    ...mapState(["OriginImgData"]),
+    ...mapState(['OriginImgData']),
     OriginImgDataList() {
-      if (this.OriginImgData) {
-        return this.OriginImgData;
-      }
-      return [];
+      if (this.OriginImgData)
+        return this.OriginImgData
+
+      return []
     },
   },
   methods: {
     removeImg(imgName) {
-      this.$store.dispatch("removeImg", imgName);
+      this.$store.dispatch('removeImg', imgName)
     },
     changeMainPreview(imgName) {
-      this.$store.dispatch("changeCurrentImg", imgName);
+      this.$store.dispatch('changeCurrentImg', imgName)
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

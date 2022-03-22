@@ -1,20 +1,20 @@
 <template>
   <Layout class="main">
     <Sider class="sider" hide-trigger>
-      <SiderPreviewCard></SiderPreviewCard>
+      <SiderPreviewCard />
     </Sider>
     <Content class="content">
-      <MainPreviewCard></MainPreviewCard>
+      <MainPreviewCard />
     </Content>
   </Layout>
 </template>
 
 <script>
-import SiderPreviewCard from "@/components/main/SiderPreviewCard.vue";
-import MainPreviewCard from "@/components/main/MainPreviewCard.vue";
+import SiderPreviewCard from '@/components/main/SiderPreviewCard.vue'
+import MainPreviewCard from '@/components/main/MainPreviewCard.vue'
 export default {
   components: { SiderPreviewCard, MainPreviewCard },
-};
+}
 </script>
 
 <style lang="scss" scoped>

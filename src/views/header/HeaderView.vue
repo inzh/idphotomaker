@@ -5,8 +5,8 @@
         <div class="layout-nav">
           <Dropdown class="upload-img">
             <Upload
-              action="#"
               ref="upload"
+              action="#"
               :multiple="false"
               :show-upload-list="false"
               :before-upload="loadImg"
@@ -41,50 +41,51 @@
         </div>
       </Menu>
     </Header>
-    <SmartCrop v-model="smartCropModalVal"></SmartCrop>
+    <SmartCrop v-model="smartCropModalVal" />
   </div>
 </template>
 
 <script>
-import SmartCrop from "@/components/header/SmartCrop.vue";
+import SmartCrop from '@/components/header/SmartCrop.vue'
 export default {
+  components: { SmartCrop },
   data() {
     return {
-      accept: "image/jpeg,image/jpg,image/png",
+      accept: 'image/jpeg,image/jpg,image/png',
       smartCropModalVal: false,
-    };
+    }
   },
-  components: { SmartCrop },
   methods: {
     loadImg(file) {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
       reader.onload = (img) => {
         // 将上传的图片名字和base64Url分发
-        this.$store.dispatch("addImgData", {
+        this.$store.dispatch('addImgData', {
           imgName: file.name,
           imgSrc: img.target.result,
-        });
-        this.$store.dispatch("changeCurrentImg", file.name);
+        })
+        this.$store.dispatch('changeCurrentImg', file.name)
         // 清空上传列表
-        this.$refs.upload.clearFiles();
-      };
+        this.$refs.upload.clearFiles()
+      }
       // 禁止默认自动上传
-      return false;
+      return false
     },
     handleFormatError() {
-      console.log("文件不是图片");
+      console.log('文件不是图片')
     },
     resetCurrentImg() {
-      if (this.$store.state.currentMainPreviewImgName == "") {
-        this.$Message.error("没有要重置的图片");
-      } else {
-        this.$store.dispatch("resetCurrentImg");
-        this.$Message.success("重置成功！");
+      if (this.$store.state.currentMainPreviewImgName === '') {
+        this.$Message.error('没有要重置的图片')
+      }
+      else {
+        this.$store.dispatch('resetCurrentImg')
+        this.$Message.success('重置成功！')
       }
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

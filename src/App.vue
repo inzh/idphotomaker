@@ -2,22 +2,22 @@
   <div id="app">
     <div class="layout">
       <Layout>
-        <HeaderView></HeaderView>
-        <MainView></MainView>
+        <HeaderView />
+        <MainView />
       </Layout>
     </div>
   </div>
 </template>
 
 <script>
-import HeaderView from "@/views/header/HeaderView.vue";
-import MainView from "@/views/main/MainView.vue";
+import HeaderView from '@/views/header/HeaderView.vue'
+import MainView from '@/views/main/MainView.vue'
 export default {
   components: {
     HeaderView,
     MainView,
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 #app {

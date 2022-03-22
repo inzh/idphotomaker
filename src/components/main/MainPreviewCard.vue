@@ -1,18 +1,18 @@
 <template>
   <div id="show-img">
-    <img :src="getCurrentImgSrc" alt="" v-if="ModifiedImgData.length != 0" />
+    <img v-if="ModifiedImgData.length != 0" :src="getCurrentImgSrc" alt="">
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapGetters, mapState } from 'vuex'
 export default {
-  name: "MainPreviewCard",
+  name: 'MainPreviewCard',
   computed: {
-    ...mapState(["ModifiedImgData"]),
-    ...mapGetters(["getCurrentImgSrc"]),
+    ...mapState(['ModifiedImgData']),
+    ...mapGetters(['getCurrentImgSrc']),
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
