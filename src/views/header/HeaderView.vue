@@ -33,7 +33,7 @@
             </Button>
           </Dropdown>
           <Dropdown class="replace-bg">
-            <Button type="text">
+            <Button type="text" @click="backgroundReplaceModalVal = true">
               <Icon type="ios-aperture-outline" />
               背景替换
             </Button>
@@ -42,17 +42,20 @@
       </Menu>
     </Header>
     <SmartCrop v-model="smartCropModalVal" />
+    <BackgroundReplace v-model="backgroundReplaceModalVal" />
   </div>
 </template>
 
 <script>
-import SmartCrop from '@/components/header/SmartCrop.vue'
+import SmartCrop from '@/components/header/SmartCrop'
+import BackgroundReplace from '@/components/header/BackgroundReplace'
 export default {
-  components: { SmartCrop },
+  components: { SmartCrop, BackgroundReplace },
   data() {
     return {
       accept: 'image/jpeg,image/jpg,image/png',
       smartCropModalVal: false,
+      backgroundReplaceModalVal: false,
     }
   },
   methods: {
