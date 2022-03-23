@@ -96,7 +96,6 @@ export default {
       autoRotate: 0,
       cutdownImgPreviewSrc: '',
       loading: false,
-      publicPath: process.env.BASE_URL,
     }
   },
   watch: {
@@ -162,8 +161,8 @@ export default {
       }
     },
     async loadModel() {
-      await faceapi.nets.ssdMobilenetv1.loadFromUri(`${this.publicPath}/models`)
-      await faceapi.nets.faceLandmark68Net.loadFromUri(`${this.publicPath}/models`)
+      await faceapi.nets.ssdMobilenetv1.loadFromUri('/idphotomaker/models/')
+      await faceapi.nets.faceLandmark68Net.loadFromUri('/idphotomaker/models/')
     },
     async smartRotate() {
       try {
