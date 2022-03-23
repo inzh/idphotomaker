@@ -38,6 +38,12 @@
               背景替换
             </Button>
           </Dropdown>
+          <Dropdown class="replace-bg">
+            <Button type="text" @click="exportImg">
+              <Icon type="ios-cloud-download-outline" />
+              导出下载
+            </Button>
+          </Dropdown>
         </div>
       </Menu>
     </Header>
@@ -85,6 +91,19 @@ export default {
       else {
         this.$store.dispatch('resetCurrentImg')
         this.$Message.success('重置成功！')
+      }
+    },
+    exportImg() {
+      const currentImgSrc = this.$store.getters.getCurrentImgSrc
+      if (currentImgSrc) {
+        const a = document.createElement('a')
+        const event = new MouseEvent('click')
+        a.download = '导出.png'
+        a.href = currentImgSrc
+        a.dispatchEvent(event)
+      }
+      else {
+        this.$Message.error('未选择图片')
       }
     },
   },

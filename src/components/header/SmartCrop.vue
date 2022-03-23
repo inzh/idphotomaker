@@ -55,10 +55,21 @@
             class="right-button"
             type="primary"
             disabled
+            :loading="loading"
+            @click="smartRotate"
+          >
+            <span v-if="!loading">自动矫正</span>
+            <span v-else>处理中...</span>
+          </Button>
+          <!-- <Button
+            ref="autoRotateButton"
+            class="right-button"
+            type="primary"
+            disabled
             @click="smartRotate"
           >
             自动矫正
-          </Button>
+          </Button> -->
         </div>
       </div>
     </div>
@@ -84,6 +95,7 @@ export default {
       showModal: false,
       autoRotate: 0,
       cutdownImgPreviewSrc: '',
+      loading: false,
     }
   },
   watch: {
@@ -155,11 +167,10 @@ export default {
     },
     async smartRotate() {
       try {
-        if (this.cutdownImgPreviewSrc === '')
-          throw new Error('没有选择图片')
-
+        if (this.cutdownImgPreviewSrc === '') throw new Error('没有选择图片')
         const input = new Image()
         input.src = this.cutdownImgPreviewSrc
+        this.loading = true
         await this.loadModel()
         const detectionWithLandmarks = await faceapi
           .detectSingleFace(input)
@@ -168,6 +179,7 @@ export default {
         const leftEye = landmarks.positions[36]
         const rightEye = landmarks.positions[45]
         this.autoRotate = this.calcAng(leftEye, rightEye)
+        this.loading = false
         this.$Message.success('自动矫正处理成功')
         this.$refs.autoRotateButton.$el.setAttribute('disabled', 'false')
       }
@@ -198,8 +210,7 @@ export default {
     },
     clearImg() {
       const img = this.$refs.previewimg.firstChild
-      if (img)
-        img.remove()
+      if (img) img.remove()
 
       this.cutdownImgPreviewSrc = ''
       this.$refs.cancelButton.$el.setAttribute('disabled', 'true')
@@ -207,8 +218,7 @@ export default {
       this.$refs.autoRotateButton.$el.setAttribute('disabled', 'true')
     },
     error(err) {
-      if (err.msg === 'No picture selected')
-        this.$Message.error('未选择图片')
+      if (err.msg === 'No picture selected') this.$Message.error('未选择图片')
     },
     saveCropedImg() {
       const img = this.$refs.previewimg.firstChild
