@@ -159,7 +159,6 @@ export default {
         const angle = (radian * 180) / Math.PI
         return -angle
       }
-      // 第四象限
     },
     async loadModel() {
       await faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
