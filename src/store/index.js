@@ -6,11 +6,11 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     // 左侧原始图片数据，原始图片不修改
-    OriginImgData: [],
+    OriginImgData: JSON.parse(localStorage.getItem('OriginImgData')) || [],
     // 中间显示图片数据，中间图片会进行修改操作
-    ModifiedImgData: [],
+    ModifiedImgData: JSON.parse(localStorage.getItem('ModifiedImgData')) || [],
     // 当前中间显示图片的名字
-    currentMainPreviewImgName: '',
+    currentMainPreviewImgName: localStorage.getItem('currentMainPreviewImgName') || '',
   },
   getters: {
     // 获取中间显示图片的图片base64
@@ -30,6 +30,8 @@ export default new Vuex.Store({
     ADD_IMG_DATA(state, img) {
       state.OriginImgData.push(img)
       state.ModifiedImgData.push(img)
+      localStorage.setItem('OriginImgData', JSON.stringify(state.OriginImgData))
+      localStorage.setItem('ModifiedImgData', JSON.stringify(state.ModifiedImgData))
     },
     // 根据图片名字从OriginImgData和ModifiedImgData中删除对应图片
     RM_IMG_DATA(state, imgName) {
@@ -47,12 +49,18 @@ export default new Vuex.Store({
           state.currentMainPreviewImgName
             = state.OriginImgData[state.OriginImgData.length - 1].imgName
         }
+        localStorage.setItem('OriginImgData', JSON.stringify(state.OriginImgData))
+        localStorage.setItem('ModifiedImgData', JSON.stringify(state.ModifiedImgData))
+        localStorage.setItem('currentMainPreviewImgName', state.currentMainPreviewImgName)
       }
       else {
-        // 只加载了一张图片，则直接全部清空完成删除
+        // 只剩下一张图片，则直接全部清空完成删除
         state.OriginImgData = []
         state.ModifiedImgData = []
         state.currentMainPreviewImgName = ''
+        localStorage.removeItem('OriginImgData')
+        localStorage.removeItem('ModifiedImgData')
+        localStorage.removeItem('currentMainPreviewImgName')
       }
     },
     UPDATE_IMG_DATA(state, img) {
@@ -60,9 +68,11 @@ export default new Vuex.Store({
         item => item.imgName === img.imgName,
       )
       state.ModifiedImgData.splice(index, 1, img)
+      localStorage.setItem('ModifiedImgData', JSON.stringify(state.ModifiedImgData))
     },
     CHANGE_CURRENT_IMG(state, imgName) {
       state.currentMainPreviewImgName = imgName
+      localStorage.setItem('currentMainPreviewImgName', state.currentMainPreviewImgName)
     },
     RESET_CURRENT_IMG(state) {
       if (state.ModifiedImgData.length > 0) {
@@ -74,6 +84,7 @@ export default new Vuex.Store({
         )
         state.ModifiedImgData.splice(ModifiedImgIndex, 1, currentOriginImgData)
       }
+      localStorage.setItem('ModifiedImgData', JSON.stringify(state.ModifiedImgData))
     },
   },
   actions: {
