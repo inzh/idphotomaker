@@ -161,8 +161,8 @@ export default {
       }
     },
     async loadModel() {
-      await faceapi.nets.ssdMobilenetv1.loadFromUri('/idphotomaker/models/')
-      await faceapi.nets.faceLandmark68Net.loadFromUri('/idphotomaker/models/')
+      await faceapi.nets.ssdMobilenetv1.loadFromUri('/models/')
+      await faceapi.nets.faceLandmark68Net.loadFromUri('/models/')
     },
     async smartRotate() {
       try {
